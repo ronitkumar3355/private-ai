@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Private AI</title>
+</head>
+<body>
+  <h2>Private AI Chat</h2>
+
+  <input id="msg" placeholder="Message likho" />
+  <button onclick="send()">Send</button>
+
+  <pre id="out"></pre>
+
+  <script>
+    async function send() {
+      const message = document.getElementById("msg").value;
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      document.getElementById("out").innerText = data.reply;
+    }
+  </script>
+</body>
+</html>
