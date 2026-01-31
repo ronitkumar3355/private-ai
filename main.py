@@ -21,3 +21,7 @@ async def chat(data: dict):
     msg = data.get("message", "")
     reply = ask_ai(msg)   # 🔥 AI brain call
     return {"reply": reply}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
