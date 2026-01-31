@@ -6,7 +6,7 @@ import os
 
 app = FastAPI()
 
-# CORS
+# CORS (frontend se call ke liye)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,17 +15,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Root check
 @app.get("/")
 def home():
     return {"status": "Private AI is running 🚀"}
 
+# Chat API
 @app.post("/chat")
 def chat(data: dict):
     user_input = data.get("message", "")
     reply = ask_ai(user_input)
     return {"reply": reply}
 
-# ✅ UI route (100% correct)
+# UI serve
 @app.get("/ui")
 def serve_ui():
     base_dir = os.path.dirname(__file__)
