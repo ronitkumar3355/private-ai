@@ -33,3 +33,10 @@ def serve_ui():
     base_dir = os.path.dirname(__file__)
     file_path = os.path.join(base_dir, "frontend", "index.html")
     return FileResponse(file_path)
+@app.get("/")
+def root():
+    return {"message": "API is running 🚀"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
