@@ -9,20 +9,30 @@
   <input id="msg" placeholder="Message likho" />
   <button onclick="send()">Send</button>
 
-  <pre id="out"></pre>
+  <pre id="out">Waiting...</pre>
 
   <script>
     async function send() {
       const message = document.getElementById("msg").value;
 
-      const res = await fetch(window.location.origin + "/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
-      });
+      document.getElementById("out").innerText = "Sending to AI...";
 
-      const data = await res.json();
-      document.getElementById("out").innerText = data.reply;
+      try {
+        const res = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: message })
+        });
+
+        const data = await res.json();
+
+        document.getElementById("out").innerText =
+          "AI Reply:\n" + JSON.stringify(data, null, 2);
+
+      } catch (e) {
+        document.getElementById("out").innerText =
+          "Error: " + e;
+      }
     }
   </script>
 </body>
