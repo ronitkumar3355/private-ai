@@ -9,6 +9,9 @@ from tools.news_check import check_news_freshness
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
+# ✅ DEBUG — Render logs me dikhega
+print("API KEY FROM ENV:", API_KEY)
+
 BLOCKED_WORDS = ["hack", "crack", "password", "illegal"]
 
 
@@ -48,42 +51,37 @@ def ask_ai(user_input):
 
     # 🤖 LLM CALL
     if not API_KEY:
-        return "❌ API key missing. Check OPENROUTER_API_KEY in environment."
+        return "❌ API key missing. Check OPENROUTER_API_KEY in Render Environment."
 
     today = datetime.now().strftime("%d %B %Y")
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json",
         "HTTP-Referer": "https://private-ai-wtp.onrender.com",
-        "X-Title": "Private-AI",
+        "X-Title": "Private AI",
+        "Content-Type": "application/json",
     }
 
     data = {
-        "model": "deepseek/deepseek-chat",
+        "model": "openai/gpt-4o-mini",
         "messages": [
-            {
-                "role": "system",
-                "content": f"Aaj ki date {today} hai. User jis language me bole usi me reply karo."
-            },
-            {
-                "role": "user",
-                "content": user_input
-            }
+            {"role": "system", "content": f"Aaj ki date {today} hai."},
+            {"role": "user", "content": user_input},
         ],
-        "temperature": 0.7
+        "temperature": 0.7,
     }
 
     try:
         response = requests.post(API_URL, headers=headers, json=data, timeout=25)
+
+        # ✅ Agar error aaya to exact dikhe
+        if response.status_code != 200:
+            return f"❌ OpenRouter HTTP {response.status_code}: {response.text}"
+
         result = response.json()
+        print("OpenRouter Response:", result)
 
-        print("OpenRouter Response:", result)  # Render logs
-
-        if "choices" in result and len(result["choices"]) > 0:
-            return result["choices"][0]["message"]["content"]
-
-        return f"❌ OpenRouter Error: {result}"
+        return result["choices"][0]["message"]["content"]
 
     except Exception as e:
         return f"❌ Network Error: {e}"
