@@ -1,3 +1,4 @@
+import os
 import requests
 from datetime import datetime
 
@@ -5,8 +6,8 @@ from tools.web_search import web_search
 from tools.gold_price import get_gold_price_inr
 from tools.news_check import check_news_freshness
 
-API_KEY = "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"
 API_URL = "https://openrouter.ai/api/v1/chat/completions"
+API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 BLOCKED_WORDS = ["hack", "crack", "password", "illegal"]
 
@@ -45,12 +46,17 @@ def ask_ai(user_input):
         query = user_input.replace("search ", "", 1)
         return f"🌐 AI: {web_search(query)}"
 
-    # 🤖 LLM CALL (FIXED)
+    # 🤖 LLM CALL
+    if not API_KEY:
+        return "❌ API key missing. Check OPENROUTER_API_KEY in environment."
+
     today = datetime.now().strftime("%d %B %Y")
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
+        "HTTP-Referer": "https://private-ai-wtp.onrender.com",
+        "X-Title": "Private-AI",
     }
 
     data = {
@@ -72,8 +78,7 @@ def ask_ai(user_input):
         response = requests.post(API_URL, headers=headers, json=data, timeout=25)
         result = response.json()
 
-        # 👇 DEBUG (Render logs me dikhega)
-        print("OpenRouter Response:", result)
+        print("OpenRouter Response:", result)  # Render logs
 
         if "choices" in result and len(result["choices"]) > 0:
             return result["choices"][0]["message"]["content"]

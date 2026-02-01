@@ -2,3 +2,5 @@
 _pycache_/
 *.pyc
 core/memory.json
+.env
+.env.local
