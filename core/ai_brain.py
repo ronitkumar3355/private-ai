@@ -10,6 +10,7 @@ API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 BLOCKED_WORDS = ["hack", "crack", "password", "illegal"]
 
+
 def ask_ai(user_input):
     text = user_input.lower()
 
@@ -44,15 +45,12 @@ def ask_ai(user_input):
         query = user_input.replace("search ", "", 1)
         return f"🌐 AI: {web_search(query)}"
 
-    # 🤖 LLM CALL
+    # 🤖 LLM CALL (FIXED)
     today = datetime.now().strftime("%d %B %Y")
 
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Referer": "http://localhost",
-        "X-Title": "Private-AI"
     }
 
     data = {
@@ -60,11 +58,7 @@ def ask_ai(user_input):
         "messages": [
             {
                 "role": "system",
-                "content": (
-                    f"Aaj ki date {today} hai. "
-                    "Tum ek smart private AI ho. "
-                    "User jis language me bole, usi language me reply karo."
-                )
+                "content": f"Aaj ki date {today} hai. User jis language me bole usi me reply karo."
             },
             {
                 "role": "user",
@@ -75,14 +69,16 @@ def ask_ai(user_input):
     }
 
     try:
-        response = requests.post(API_URL, headers=headers, json=data, timeout=20)
+        response = requests.post(API_URL, headers=headers, json=data, timeout=25)
         result = response.json()
 
-        if "choices" in result:
+        # 👇 DEBUG (Render logs me dikhega)
+        print("OpenRouter Response:", result)
+
+        if "choices" in result and len(result["choices"]) > 0:
             return result["choices"][0]["message"]["content"]
+
+        return f"❌ OpenRouter Error: {result}"
 
     except Exception as e:
         return f"❌ Network Error: {e}"
-
-    # ✅ FINAL FALLBACK (yeh missing tha)
-    return f"🤖 AI soch ke bola: {user_input}"
