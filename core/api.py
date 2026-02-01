@@ -20,6 +20,11 @@ app.add_middleware(
 def home():
     return {"status": "Private AI is running 🚀"}
 
+# Health check
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
 # Chat API
 @app.post("/chat")
 def chat(data: dict):
@@ -30,13 +35,4 @@ def chat(data: dict):
 # UI serve
 @app.get("/ui")
 def serve_ui():
-    base_dir = os.path.dirname(__file__)
-    file_path = os.path.join(base_dir, "frontend", "index.html")
-    return FileResponse(file_path)
-@app.get("/")
-def root():
-    return {"message": "API is running 🚀"}
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+    return FileResponse("core/frontend/index.html")
